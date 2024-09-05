@@ -29,7 +29,13 @@ public class StudentService {
     }
 
     public List<StudentModel> findAllStudents(){
+
         return studentRepository.findAll();
     }
 
+
+    public StudentModel findByName(String name){
+
+        return studentRepository.findByName(name);
+    }
 }
