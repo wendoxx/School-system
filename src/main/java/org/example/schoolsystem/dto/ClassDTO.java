@@ -10,5 +10,5 @@ import java.util.UUID;
 public class ClassDTO {
     private UUID id;
     private TeacherModel teacherModel;
-    private Set<StudentDTO> studentDTOs;
+    private Set<StudentDTO> studentDTO;
 }
