@@ -32,8 +32,9 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<StudentModel> saveStudent(StudentModel student){
-        return ResponseEntity.ok(studentService.saveStudent(student));
+    public ResponseEntity<StudentModel> saveStudent(@RequestBody StudentModel student){
+        StudentModel savedStudent = studentService.saveStudent(student);
+        return ResponseEntity.status(201).body(savedStudent);
     }
 
     @DeleteMapping("/delete/{id}")
