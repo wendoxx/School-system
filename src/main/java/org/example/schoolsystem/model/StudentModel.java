@@ -25,6 +25,6 @@ public class StudentModel {
 
     @ManyToOne
     @JoinColumn(name = "class_id")
-    private ClassModel classModel;
+    private ClassModel schoolClass;
 
 }
