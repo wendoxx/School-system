@@ -17,8 +17,8 @@ public class ClassModel {
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
-    private TeacherModel teacherModel;
+    private TeacherModel teacher;
 
-    @OneToMany(mappedBy = "classModel", fetch = FetchType.LAZY)
-    private Set<StudentModel> studentModels;
+    @OneToMany(mappedBy = "schoolClass", fetch = FetchType.LAZY)
+    private Set<StudentModel> students;
 }
