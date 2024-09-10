@@ -24,7 +24,7 @@ public class TeacherModel {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @OneToMany(mappedBy = "teacherModel", fetch = FetchType.LAZY)
-    private Set<ClassModel> classModels;
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    private Set<ClassModel> SchoolClass;
 
 }
