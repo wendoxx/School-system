@@ -1,6 +1,7 @@
 package org.example.schoolsystem.controller;
 
 import lombok.AllArgsConstructor;
+import org.example.schoolsystem.dto.ClassDTO;
 import org.example.schoolsystem.model.ClassModel;
 import org.example.schoolsystem.service.ClassService;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/class")
+@RequestMapping("/api/v2/class")
 @AllArgsConstructor
 public class ClassController {
 
@@ -21,8 +22,8 @@ public class ClassController {
     }
 
     @PostMapping
-    public ResponseEntity<ClassModel> saveClass(@RequestBody ClassModel classModel){
-        ClassModel savedClass = classService.saveClass(classModel);
+    public ResponseEntity<ClassModel> saveClass(@RequestBody ClassDTO classDTO){
+        ClassModel savedClass = classService.saveClass(classDTO);
         return ResponseEntity.status(201).body(savedClass);
     }
 
