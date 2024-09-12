@@ -2,6 +2,7 @@ package org.example.schoolsystem.controller;
 
 import lombok.AllArgsConstructor;
 import org.example.schoolsystem.dto.ClassDTO;
+import org.example.schoolsystem.dto.StudentDTO;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.service.StudentService;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class StudentController {
     }
 
     @PostMapping
-    public ResponseEntity<StudentModel> saveStudent(@RequestBody StudentModel student){
+    public ResponseEntity<StudentModel> saveStudent(@RequestBody StudentDTO student){
         StudentModel savedStudent = studentService.saveStudent(student);
         return ResponseEntity.status(201).body(savedStudent);
     }

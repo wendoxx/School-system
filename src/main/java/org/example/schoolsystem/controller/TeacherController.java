@@ -1,6 +1,7 @@
 package org.example.schoolsystem.controller;
 
 import lombok.AllArgsConstructor;
+import org.example.schoolsystem.dto.TeacherDTO;
 import org.example.schoolsystem.model.TeacherModel;
 import org.example.schoolsystem.service.TeacherService;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class TeacherController {
     }
 
     @PostMapping
-    public ResponseEntity<TeacherModel> saveTeacher(@RequestBody TeacherModel teacher){
+    public ResponseEntity<TeacherModel> saveTeacher(@RequestBody TeacherDTO teacher){
         TeacherModel savedTeacher = teacherService.saveTeacher(teacher);
         return ResponseEntity.status(201).body(savedTeacher);
     }
