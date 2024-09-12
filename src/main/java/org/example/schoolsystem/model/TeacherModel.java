@@ -1,15 +1,22 @@
 package org.example.schoolsystem.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name = "teacher")
 @Data
-public class TeacherModel {
+public class TeacherModel implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,6 +32,19 @@ public class TeacherModel {
     private String address;
 
     @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<ClassModel> SchoolClass;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TeacherModel that = (TeacherModel) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
