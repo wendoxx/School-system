@@ -6,10 +6,11 @@ import org.example.schoolsystem.service.TeacherService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/teacher")
+@RequestMapping("/api/v2/teacher")
 @AllArgsConstructor
 public class TeacherController {
 
@@ -23,6 +24,11 @@ public class TeacherController {
     @GetMapping("/byName")
     public ResponseEntity<TeacherModel> getTeacherByName(@RequestParam String name){
         return ResponseEntity.ok(teacherService.findByName(name));
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<TeacherModel>> getAllTeachers(){
+        return ResponseEntity.ok(teacherService.findAllTeachers());
     }
 
     @PostMapping
