@@ -7,6 +7,7 @@ import org.example.schoolsystem.service.ClassService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,13 +22,25 @@ public class ClassController {
         return ResponseEntity.ok(classService.findClassById(id));
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<List<ClassModel>> getAllClasses(){
+        return ResponseEntity.ok(classService.findAllClasses());
+    }
+
     @PostMapping
     public ResponseEntity<ClassModel> saveClass(@RequestBody ClassDTO classDTO){
         ClassModel savedClass = classService.saveClass(classDTO);
         return ResponseEntity.status(201).body(savedClass);
     }
 
-    @DeleteMapping("/delete/{id}")
+
+    @PutMapping
+    public ResponseEntity<ClassModel> updateClass(@RequestBody ClassDTO classDTO){
+        ClassModel updatedClass = classService.saveClass(classDTO);
+        return ResponseEntity.ok(updatedClass);
+    }
+
+   @DeleteMapping("/delete/{id}")
     public ResponseEntity<ClassModel> deleteClassById(@PathVariable UUID id) {
         classService.deleteClassById(id);
         return ResponseEntity.noContent().build();
