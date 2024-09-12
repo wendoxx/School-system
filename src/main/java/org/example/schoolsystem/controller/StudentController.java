@@ -1,6 +1,7 @@
 package org.example.schoolsystem.controller;
 
 import lombok.AllArgsConstructor;
+import org.example.schoolsystem.dto.ClassDTO;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.service.StudentService;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,13 @@ public class StudentController {
     @GetMapping("/getAll")
     public ResponseEntity<List<StudentModel>> getAllStudents(){
         return ResponseEntity.ok(studentService.findAllStudents());
+    }
+
+    @GetMapping("/byClass/{id}")
+    public ResponseEntity<List<StudentModel>> getStudentByClass(@PathVariable UUID id){
+        ClassDTO classDTO = new ClassDTO();
+        classDTO.setId(id);
+        return ResponseEntity.ok(studentService.findStudentsByClass(classDTO));
     }
 
     @PostMapping
