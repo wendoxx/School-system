@@ -3,6 +3,7 @@ package org.example.schoolsystem.service;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.example.schoolsystem.dto.ClassDTO;
+import org.example.schoolsystem.dto.StudentDTO;
 import org.example.schoolsystem.model.ClassModel;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.repository.ClassRepository;
@@ -34,8 +35,14 @@ public class StudentService {
     }
 
     @Transactional
-    public StudentModel saveStudent(StudentModel student) {
-        return studentRepository.save(student);
+    public StudentModel saveStudent(StudentDTO student) {
+        StudentModel studentModel = new StudentModel();
+        studentModel.setName(student.getName());
+        studentModel.setAddress(student.getAddress());
+        studentModel.setEmail(student.getEmail());
+        studentModel.setPhone(student.getPhone());
+        studentModel.setSchoolClass(classRepository.findById(student.getClassId()).get());
+        return studentRepository.save(studentModel);
     }
 
     public StudentModel deleteStudentById(UUID id) {

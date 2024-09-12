@@ -1,6 +1,7 @@
 package org.example.schoolsystem.service;
 
 import lombok.AllArgsConstructor;
+import org.example.schoolsystem.dto.TeacherDTO;
 import org.example.schoolsystem.model.TeacherModel;
 import org.example.schoolsystem.repository.TeacherRepository;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,13 @@ public class TeacherService {
         return teacherRepository.findAll();
     }
 
-    public TeacherModel saveTeacher(TeacherModel teacher) {
-        return teacherRepository.save(teacher);
+    public TeacherModel saveTeacher(TeacherDTO teacher) {
+        TeacherModel teacherModel = new TeacherModel();
+        teacherModel.setName(teacher.getName());
+        teacherModel.setAddress(teacher.getAddress());
+        teacherModel.setEmail(teacher.getEmail());
+        teacherModel.setPhone(teacher.getPhone());
+        return teacherRepository.save(teacherModel);
     }
 
     public TeacherModel deleteTeacherById(UUID id) {
