@@ -11,7 +11,7 @@ import org.example.schoolsystem.repository.StudentRepository;
 import org.example.schoolsystem.repository.TeacherRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -27,6 +27,10 @@ public class ClassService {
         return classRepository.findById(id).get();
     }
 
+    public List<ClassModel> findAllClasses(){
+        return classRepository.findAll();
+    }
+
     @Transactional
     public ClassModel saveClass(ClassDTO classDTO) {
         ClassModel classModel = new ClassModel();
@@ -34,17 +38,16 @@ public class ClassService {
                 .orElseThrow(() -> new RuntimeException("Teacher not found"));
 
         classModel.setTeacher(teacher);
-
-        //students is a set of student ids
+        // Set students
         Set<StudentModel> students = classDTO.getStudents().stream()
                 .map(UUID::fromString)
                 .map(studentRepository::findById)
                 .map(optionalStudent -> optionalStudent.orElseThrow( () -> new RuntimeException("Student not found")))
                 .collect(Collectors.toSet());
-
+        students.forEach(student -> student.setSchoolClass(classModel));
         classModel.setStudents(students);
-        return classRepository.save(classModel);
-
+        classRepository.save(classModel);
+        return classModel;
     }
 
     public ClassModel deleteClassById(UUID id) {
