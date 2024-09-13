@@ -41,7 +41,6 @@ public class StudentService {
         studentModel.setAddress(student.getAddress());
         studentModel.setEmail(student.getEmail());
         studentModel.setPhone(student.getPhone());
-        studentModel.setSchoolClass(classRepository.findById(student.getClassId()).get());
         return studentRepository.save(studentModel);
     }
 
