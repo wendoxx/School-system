@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.Logger;
 import org.example.schoolsystem.dto.ClassDTO;
+import org.example.schoolsystem.exception.NotFoundException;
 import org.example.schoolsystem.model.ClassModel;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.model.TeacherModel;
@@ -27,8 +28,12 @@ public class ClassService {
 
     public ClassModel findClassById(UUID id){
         LOGGER.info("Finding class by id: " + id);
-        return classRepository.findById(id).get();
+        return classRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Class not found");
+            return new NotFoundException("Class not found");
+        });
     }
+
 
     public List<ClassModel> findAllClasses(){
         LOGGER.info("Finding all classes");
@@ -39,14 +44,14 @@ public class ClassService {
     public ClassModel saveClass(ClassDTO classDTO) {
         ClassModel classModel = new ClassModel();
         TeacherModel teacher = teacherRepository.findById(classDTO.getTeacherId())
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+                .orElseThrow(() -> new NotFoundException("Teacher not found"));
 
         classModel.setTeacher(teacher);
         // Set students
         Set<StudentModel> students = classDTO.getStudents().stream()
                 .map(UUID::fromString)
                 .map(studentRepository::findById)
-                .map(optionalStudent -> optionalStudent.orElseThrow( () -> new RuntimeException("Student not found")))
+                .map(optionalStudent -> optionalStudent.orElseThrow( () -> new NotFoundException("Student not found")))
                 .collect(Collectors.toSet());
         students.forEach(student -> student.setSchoolClass(classModel));
         classModel.setStudents(students);
@@ -56,7 +61,10 @@ public class ClassService {
     }
 
     public ClassModel deleteClassById(UUID id) {
-        ClassModel classModel = classRepository.findById(id).get();
+        ClassModel classModel = classRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Class not found");
+            return new NotFoundException("Class not found for deletion");
+        });
         classRepository.deleteById(id);
         LOGGER.info("Class deleted successfully");
         return classModel;
