@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.Logger;
 import org.example.schoolsystem.dto.ClassDTO;
 import org.example.schoolsystem.dto.StudentDTO;
+import org.example.schoolsystem.exception.NotFoundException;
 import org.example.schoolsystem.model.ClassModel;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.repository.ClassRepository;
@@ -23,17 +24,29 @@ public class StudentService {
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(StudentService.class);
 
     public StudentModel findStudentById(UUID id) {
-        LOGGER.info("Finding student.");
-        return studentRepository.findById(id).get();
+        LOGGER.info("Finding student by id: {}", id);
+        return studentRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Student not found");
+            return new NotFoundException("Student not found");
+        });
     }
 
     public StudentModel findByName(String name){
-        LOGGER.info("Finding student by name: " + name);
-        return studentRepository.findByName(name);
+        LOGGER.info("Finding student by name: {}", name);
+        StudentModel student = studentRepository.findByName(name);
+
+        if (student == null) {
+            LOGGER.error("Student not found");
+            throw new NotFoundException("Student not found");
+        }
+        return student;
     }
 
     public List<StudentModel> findStudentsByClass(ClassDTO classDTO){
-        ClassModel schoolClass = classRepository.findById(classDTO.getId()).get();
+        ClassModel schoolClass = classRepository.findById(classDTO.getId()).orElseThrow(() -> {
+            LOGGER.error("Class not found");
+            return new NotFoundException("Class not found");
+        });
         LOGGER.info("Finding students by class.");
         return studentRepository.findBySchoolClass(schoolClass);
 
@@ -52,7 +65,10 @@ public class StudentService {
     }
 
     public StudentModel deleteStudentById(UUID id) {
-        StudentModel student = studentRepository.findById(id).get();
+        StudentModel student = studentRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Student not found for deletion");
+            return new NotFoundException("Student not found");
+        });
         studentRepository.deleteById(id);
         LOGGER.info("Student deleted successfully");
         return student;

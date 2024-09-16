@@ -18,11 +18,20 @@ public class TeacherService {
 
     public TeacherModel findTeacherById(UUID id){
         LOGGER.info("Finding teacher by id: " + id);
-        return teacherRepository.findById(id).get();
+        return teacherRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Teacher not found");
+            return new RuntimeException("Teacher not found");
+        });
     }
 
     public TeacherModel findByName(String name){
         LOGGER.info("Finding teacher by name: " + name);
+        TeacherModel teacher = teacherRepository.findByName(name);
+
+        if (teacher == null) {
+            LOGGER.error("Teacher not found");
+            throw new RuntimeException("Teacher not found");
+        }
         return teacherRepository.findByName(name);
     }
 
@@ -42,7 +51,10 @@ public class TeacherService {
     }
 
     public TeacherModel deleteTeacherById(UUID id) {
-        TeacherModel teacher = teacherRepository.findById(id).get();
+        TeacherModel teacher = teacherRepository.findById(id).orElseThrow(() -> {
+            LOGGER.error("Teacher not found for deletion");
+            return new RuntimeException("Teacher not found");
+        });
         teacherRepository.deleteById(id);
         LOGGER.info("Teacher deleted successfully");
         return teacher;
