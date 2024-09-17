@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -24,12 +25,17 @@ public class ClassModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @Column(name = "subject", nullable = false)
+    private String subject;
+
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @ToString.Exclude
     private TeacherModel teacher;
 
     @OneToMany(mappedBy = "schoolClass", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
+    @ToString.Exclude
     private Set<StudentModel> students = new HashSet<>();
 
     @Override

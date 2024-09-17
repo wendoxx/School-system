@@ -3,6 +3,7 @@ package org.example.schoolsystem.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -31,6 +32,7 @@ public class StudentModel implements Serializable {
     @ManyToOne
     @JoinColumn(name = "class_id")
     @JsonBackReference
+    @ToString.Exclude
     private ClassModel schoolClass;
 
     @Override
