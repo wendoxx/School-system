@@ -3,8 +3,10 @@ package org.example.schoolsystem.service;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.Logger;
 import org.example.schoolsystem.dto.TeacherDTO;
+import org.example.schoolsystem.exception.NotFoundException;
 import org.example.schoolsystem.model.TeacherModel;
 import org.example.schoolsystem.repository.TeacherRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,49 +17,73 @@ import java.util.UUID;
 public class TeacherService {
     private final TeacherRepository teacherRepository;
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(TeacherService.class);
+    private final ModelMapper modelMapper;
 
-    public TeacherModel findTeacherById(UUID id){
-        LOGGER.info("Finding teacher by id: " + id);
-        return teacherRepository.findById(id).orElseThrow(() -> {
+    public TeacherDTO findTeacherById(UUID id) {
+        LOGGER.info("Finding teacher by id: {}", id);
+        TeacherModel teacher = modelMapper.map(teacherRepository.findById(id).orElseThrow(() -> {
+
             LOGGER.error("Teacher not found");
-            return new RuntimeException("Teacher not found");
-        });
+            return new NotFoundException("Teacher not found");
+        }), TeacherModel.class);
+
+        return modelMapper.map(teacher, TeacherDTO.class);
     }
 
-    public TeacherModel findByName(String name){
-        LOGGER.info("Finding teacher by name: " + name);
-        TeacherModel teacher = teacherRepository.findByName(name);
+    public TeacherDTO findByName(String name){
+        LOGGER.info("Finding teacher by name: {}", name);
+        TeacherModel teacher = modelMapper.map(teacherRepository.findByName(name), TeacherModel.class);
 
         if (teacher == null) {
             LOGGER.error("Teacher not found");
-            throw new RuntimeException("Teacher not found");
+            throw new NotFoundException("Teacher not found");
         }
-        return teacherRepository.findByName(name);
+        return modelMapper.map(teacher, TeacherDTO.class);
     }
 
-    public List<TeacherModel> findAllTeachers(){
+    public List<TeacherDTO> findAllTeachers(){
+        TeacherModel teacher = modelMapper.map(teacherRepository.findAll(), TeacherModel.class);
         LOGGER.info("Finding all teachers");
-        return teacherRepository.findAll();
+
+        if (teacher == null) {
+            LOGGER.error("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
+
+        return modelMapper.map(teacherRepository.findAll(), List.class);
     }
 
-    public TeacherModel saveTeacher(TeacherDTO teacher) {
-        TeacherModel teacherModel = new TeacherModel();
-        teacherModel.setName(teacher.getName());
-        teacherModel.setAddress(teacher.getAddress());
-        teacherModel.setEmail(teacher.getEmail());
-        teacherModel.setPhone(teacher.getPhone());
+    public TeacherDTO saveAndUpdateTeacher(TeacherDTO teacherDTO){
+        TeacherModel teacher = modelMapper.map(teacherDTO, TeacherModel.class);
+        teacher.setName(teacher.getName());
+        teacher.setAddress(teacher.getAddress());
+        teacher.setEmail(teacher.getEmail());
+        teacher.setPhone(teacher.getPhone());
         LOGGER.info("Teacher saved successfully");
-        return teacherRepository.save(teacherModel);
+        return modelMapper.map(teacherRepository.save(teacher), TeacherDTO.class);
     }
 
-    public TeacherModel deleteTeacherById(UUID id) {
-        TeacherModel teacher = teacherRepository.findById(id).orElseThrow(() -> {
-            LOGGER.error("Teacher not found for deletion");
-            return new RuntimeException("Teacher not found");
-        });
+
+    public TeacherDTO saveTeacher(TeacherDTO teacherDTO){
+        LOGGER.info("Saving teacher");
+        return saveAndUpdateTeacher(teacherDTO);
+    }
+
+    public TeacherDTO updateTeacher(TeacherDTO teacherDTO){
+        LOGGER.info("Updating teacher");
+        if (!teacherRepository.existsById(teacherDTO.getId())) {
+            LOGGER.error("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
+        return saveAndUpdateTeacher(teacherDTO);
+    }
+
+    public void deleteTeacherById(UUID id) {
+        LOGGER.info("Deleting teacher by id: {}", id);
+        if (!teacherRepository.existsById(id)) {
+            LOGGER.error("Teacher not found");
+            throw new NotFoundException("Teacher not found");
+        }
         teacherRepository.deleteById(id);
-        LOGGER.info("Teacher deleted successfully");
-        return teacher;
     }
-
 }

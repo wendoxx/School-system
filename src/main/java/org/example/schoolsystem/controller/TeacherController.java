@@ -31,7 +31,7 @@ public class TeacherController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/{id}")
-    public ResponseEntity<TeacherModel> getTeacherById(@PathVariable UUID id){
+    public ResponseEntity<TeacherDTO> getTeacherById(@PathVariable UUID id){
         return ResponseEntity.ok(teacherService.findTeacherById(id));
     }
 
@@ -44,7 +44,7 @@ public class TeacherController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/byName")
-    public ResponseEntity<TeacherModel> getTeacherByName(@RequestParam String name){
+    public ResponseEntity<TeacherDTO> getTeacherByName(@RequestParam String name){
         return ResponseEntity.ok(teacherService.findByName(name));
     }
 
@@ -56,7 +56,7 @@ public class TeacherController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/getAll")
-    public ResponseEntity<List<TeacherModel>> getAllTeachers(){
+    public ResponseEntity<List<TeacherDTO>> getAllTeachers(){
         return ResponseEntity.ok(teacherService.findAllTeachers());
     }
 
@@ -68,9 +68,22 @@ public class TeacherController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @PostMapping
-    public ResponseEntity<TeacherModel> saveTeacher(@RequestBody TeacherDTO teacher){
-        TeacherModel savedTeacher = teacherService.saveTeacher(teacher);
+    public ResponseEntity<TeacherDTO> saveTeacher(@RequestBody TeacherDTO teacher){
+        TeacherDTO savedTeacher = teacherService.saveTeacher(teacher);
         return ResponseEntity.status(201).body(savedTeacher);
+    }
+
+    @Operation(
+            method = "PUT",
+            summary = "Update teacher",
+            description = "This endpoint updates a teacher")
+    @ApiResponse(responseCode = "201", description = "Teacher updated successfully")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @PutMapping
+    public ResponseEntity<TeacherDTO> updateTeacher(@RequestBody TeacherDTO teacher){
+        TeacherDTO updatedTeacher = teacherService.updateTeacher(teacher);
+        return ResponseEntity.status(201).body(updatedTeacher);
     }
 
     @Operation(
@@ -81,7 +94,7 @@ public class TeacherController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<TeacherModel> deleteTeacherById(@PathVariable UUID id) {
+    public ResponseEntity<TeacherDTO> deleteTeacherById(@PathVariable UUID id) {
         teacherService.deleteTeacherById(id);
         return ResponseEntity.noContent().build();
     }
