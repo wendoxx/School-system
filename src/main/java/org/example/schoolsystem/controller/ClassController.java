@@ -30,7 +30,7 @@ public class ClassController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/{id}")
-    public ResponseEntity<ClassModel> getClassById(@PathVariable UUID id){
+    public ResponseEntity<ClassDTO> getClassById(@PathVariable UUID id){
         return ResponseEntity.ok(classService.findClassById(id));
     }
 
@@ -42,8 +42,20 @@ public class ClassController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/getAll")
-    public ResponseEntity<List<ClassModel>> getAllClasses(){
+    public ResponseEntity<List<ClassDTO>> getAllClasses(){
         return ResponseEntity.ok(classService.findAllClasses());
+    }
+    @Operation(
+            method = "GET",
+            summary = "Get class by subject",
+            description = "This endpoint retrieves a class by its subject")
+    @ApiResponse(responseCode = "200", description = "Class retrieved successfully")
+    @ApiResponse(responseCode = "404", description = "Class not found")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @GetMapping
+    public ResponseEntity<ClassDTO> getClassBySubject(String subject){
+        return ResponseEntity.ok(classService.findClassBySubject(subject));
     }
 
     @Operation(
@@ -54,8 +66,8 @@ public class ClassController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @PostMapping
-    public ResponseEntity<ClassModel> saveClass(@RequestBody ClassDTO classDTO){
-        ClassModel savedClass = classService.saveClass(classDTO);
+    public ResponseEntity<ClassDTO> saveClass(@RequestBody ClassDTO classDTO){
+        ClassDTO savedClass = classService.saveClass(classDTO);
         return ResponseEntity.status(201).body(savedClass);
     }
 
@@ -67,8 +79,8 @@ public class ClassController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @PutMapping
-    public ResponseEntity<ClassModel> updateClass(@RequestBody ClassDTO classDTO){
-        ClassModel updatedClass = classService.saveClass(classDTO);
+    public ResponseEntity<ClassDTO> updateClass(@RequestBody ClassDTO classDTO){
+        ClassDTO updatedClass = classService.updateClass(classDTO);
         return ResponseEntity.ok(updatedClass);
     }
 

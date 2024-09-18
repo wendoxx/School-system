@@ -11,5 +11,4 @@ public class StudentDTO {
     private String email;
     private String phone;
     private String address;
-    private UUID classId;
 }

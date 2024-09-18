@@ -31,7 +31,7 @@ public class StudentController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/{id}")
-    public ResponseEntity<StudentModel> getStudentById(@PathVariable UUID id){
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable UUID id){
         return ResponseEntity.ok(studentService.findStudentById(id));
     }
 
@@ -56,7 +56,7 @@ public class StudentController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @GetMapping("/getAll")
-    public ResponseEntity<List<StudentModel>> getAllStudents(){
+    public ResponseEntity<List<StudentDTO>> getAllStudents(){
         return ResponseEntity.ok(studentService.findAllStudents());
     }
 
@@ -68,7 +68,7 @@ public class StudentController {
     @ApiResponse(responseCode = "404", description = "Class not found")
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @GetMapping("/byClass/{id}")
-    public ResponseEntity<List<StudentModel>> getStudentByClass(@PathVariable UUID id){
+    public ResponseEntity<List<StudentDTO>> getStudentByClass(@PathVariable UUID id){
         ClassDTO classDTO = new ClassDTO();
         classDTO.setId(id);
         return ResponseEntity.ok(studentService.findStudentsByClass(classDTO));
@@ -82,9 +82,22 @@ public class StudentController {
     @ApiResponse(responseCode = "500", description = "Internal server error")
     @ApiResponse(responseCode = "400", description = "Bad request")
     @PostMapping
-    public ResponseEntity<StudentModel> saveStudent(@RequestBody StudentDTO student){
-        StudentModel savedStudent = studentService.saveStudent(student);
+    public ResponseEntity<StudentDTO> saveStudent(@RequestBody StudentDTO student){
+        StudentDTO savedStudent = studentService.saveStudent(student);
         return ResponseEntity.status(201).body(savedStudent);
+    }
+
+    @Operation(
+            method = "PUT",
+            summary = "Update student",
+            description = "This endpoint updates a student")
+    @ApiResponse(responseCode = "201", description = "Student updated successfully")
+    @ApiResponse(responseCode = "500", description = "Internal server error")
+    @ApiResponse(responseCode = "400", description = "Bad request")
+    @PutMapping
+    public ResponseEntity<StudentDTO> updateStudent(@RequestBody StudentDTO student){
+        StudentDTO updatedStudent = studentService.updateStudent(student);
+        return ResponseEntity.status(200).body(updatedStudent);
     }
 
     @Operation(

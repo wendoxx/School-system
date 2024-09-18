@@ -10,6 +10,7 @@ import org.example.schoolsystem.model.ClassModel;
 import org.example.schoolsystem.model.StudentModel;
 import org.example.schoolsystem.repository.ClassRepository;
 import org.example.schoolsystem.repository.StudentRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,18 +23,22 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final ClassRepository classRepository;
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(StudentService.class);
+    private final ModelMapper modelMapper;
 
-    public StudentModel findStudentById(UUID id) {
+    public StudentDTO findStudentById(UUID id) {
         LOGGER.info("Finding student by id: {}", id);
-        return studentRepository.findById(id).orElseThrow(() -> {
+
+        StudentModel student = modelMapper.map(studentRepository.findById(id).orElseThrow(() -> {
             LOGGER.error("Student not found");
             return new NotFoundException("Student not found");
-        });
+        }), StudentModel.class);
+
+        return modelMapper.map(student, StudentDTO.class);
     }
 
     public StudentModel findByName(String name){
         LOGGER.info("Finding student by name: {}", name);
-        StudentModel student = studentRepository.findByName(name);
+        StudentModel student = modelMapper.map(studentRepository.findByName(name), StudentModel.class);
 
         if (student == null) {
             LOGGER.error("Student not found");
@@ -42,41 +47,68 @@ public class StudentService {
         return student;
     }
 
-    public List<StudentModel> findStudentsByClass(ClassDTO classDTO){
+    public List<StudentDTO> findStudentsByClass(ClassDTO classDTO){
         ClassModel schoolClass = classRepository.findById(classDTO.getId()).orElseThrow(() -> {
             LOGGER.error("Class not found");
             return new NotFoundException("Class not found");
         });
         LOGGER.info("Finding students by class.");
-        return studentRepository.findBySchoolClass(schoolClass);
+        return modelMapper.map(studentRepository.findBySchoolClass(schoolClass), List.class);
 
+    }
+
+    public List<StudentDTO> findAllStudents(){
+        LOGGER.info("Finding all students");
+        StudentModel student = modelMapper.map(studentRepository.findAll(), StudentModel.class);
+        if(student == null){
+            LOGGER.error("Student not found");
+            throw new NotFoundException("Student not found");
+        }
+        return modelMapper.map(studentRepository.findAll(), List.class);
     }
 
     @Transactional
-    public StudentModel saveStudent(StudentDTO student) {
+    public StudentDTO saveAndUpdateStudent(StudentDTO studentDTO){
+        StudentModel student;
+        if (studentDTO.getId() != null && studentRepository.existsById(studentDTO.getId())) {
+            student = studentRepository.findById(studentDTO.getId()).orElseThrow(() -> new NotFoundException("Student not found"));
+        } else {
+            student = new StudentModel();
+        }
 
-        StudentModel studentModel = new StudentModel();
-        studentModel.setName(student.getName());
-        studentModel.setAddress(student.getAddress());
-        studentModel.setEmail(student.getEmail());
-        studentModel.setPhone(student.getPhone());
-        LOGGER.info("Student saved successfully");
-        return studentRepository.save(studentModel);
+        student.setName(studentDTO.getName());
+        student.setAddress(studentDTO.getAddress());
+        student.setEmail(studentDTO.getEmail());
+        student.setPhone(studentDTO.getPhone());
+
+        LOGGER.info("Student saved/updated successfully");
+        return modelMapper.map(studentRepository.save(student), StudentDTO.class);
     }
 
-    public StudentModel deleteStudentById(UUID id) {
-        StudentModel student = studentRepository.findById(id).orElseThrow(() -> {
-            LOGGER.error("Student not found for deletion");
-            return new NotFoundException("Student not found");
-        });
+    @Transactional
+    public StudentDTO saveStudent(StudentDTO studentDTO) {
+        LOGGER.info("Saving student");
+        return saveAndUpdateStudent(studentDTO);
+    }
+
+    @Transactional
+    public StudentDTO updateStudent(StudentDTO studentDTO) {
+        LOGGER.info("Updating student");
+        if (!studentRepository.existsById(studentDTO.getId())) {
+            LOGGER.error("Student not found");
+            throw new NotFoundException("Student not found");
+        }
+        return saveAndUpdateStudent(studentDTO);
+    }
+
+    public void deleteStudentById(UUID id) {
+        LOGGER.info("deleting student...");
+        if(!studentRepository.existsById(id)){
+            LOGGER.error("Student not found");
+            throw new NotFoundException("Student not found");
+        }
         studentRepository.deleteById(id);
         LOGGER.info("Student deleted successfully");
-        return student;
-    }
-
-    public List<StudentModel> findAllStudents(){
-        LOGGER.info("Finding all students");
-        return studentRepository.findAll();
     }
 
 }
