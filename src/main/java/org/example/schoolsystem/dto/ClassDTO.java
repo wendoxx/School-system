@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class ClassDTO {
     private UUID id;
+    private String subject;
     private UUID teacherId;
     private Set<String> students;
 }
