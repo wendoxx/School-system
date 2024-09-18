@@ -54,11 +54,20 @@ public class TeacherService {
     }
 
     public TeacherDTO saveAndUpdateTeacher(TeacherDTO teacherDTO){
-        TeacherModel teacher = modelMapper.map(teacherDTO, TeacherModel.class);
-        teacher.setName(teacher.getName());
-        teacher.setAddress(teacher.getAddress());
-        teacher.setEmail(teacher.getEmail());
-        teacher.setPhone(teacher.getPhone());
+        TeacherModel teacher;
+        if (teacherDTO.getId() != null && teacherRepository.existsById(teacherDTO.getId())) {
+            teacher = teacherRepository.findById(teacherDTO.getId()).orElseThrow(() -> {
+                LOGGER.error("Teacher not found");
+                return new NotFoundException("Teacher not found");
+            });
+        } else {
+            teacher = new TeacherModel();
+        }
+
+        teacher.setName(teacherDTO.getName());
+        teacher.setAddress(teacherDTO.getAddress());
+        teacher.setEmail(teacherDTO.getEmail());
+        teacher.setPhone(teacherDTO.getPhone());
         LOGGER.info("Teacher saved successfully");
         return modelMapper.map(teacherRepository.save(teacher), TeacherDTO.class);
     }
@@ -79,11 +88,12 @@ public class TeacherService {
     }
 
     public void deleteTeacherById(UUID id) {
-        LOGGER.info("Deleting teacher by id: {}", id);
+        LOGGER.info("Deleting teacher...");
         if (!teacherRepository.existsById(id)) {
             LOGGER.error("Teacher not found");
             throw new NotFoundException("Teacher not found");
         }
+        LOGGER.info("Teacher deleted successfully");
         teacherRepository.deleteById(id);
     }
 }
