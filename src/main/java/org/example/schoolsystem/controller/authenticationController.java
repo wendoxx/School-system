@@ -3,6 +3,8 @@ package org.example.schoolsystem.controller;
 import jakarta.validation.Valid;
 import org.example.schoolsystem.dto.AuthorizationDTO;
 import org.example.schoolsystem.dto.RegisterDTO;
+import org.example.schoolsystem.dto.TokenDTO;
+import org.example.schoolsystem.infra.security.TokenService;
 import org.example.schoolsystem.model.user.UserModel;
 import org.example.schoolsystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,16 @@ public class authenticationController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthorizationDTO authorizationDTO){
         var userNamePassword = new UsernamePasswordAuthenticationToken(authorizationDTO.getUsername(), authorizationDTO.getPassword());
         var auth = authenticationManager.authenticate(userNamePassword);
-        return ResponseEntity.ok().build();
+
+        var token = tokenService.generateToken((UserModel) auth.getPrincipal());
+        return ResponseEntity.ok(new TokenDTO(token));
     }
 
     @PostMapping("/register")
